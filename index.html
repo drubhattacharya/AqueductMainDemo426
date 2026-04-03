@@ -519,6 +519,17 @@ button.secondary{
   background:rgba(124,58,237,.04);border:1px solid rgba(124,58,237,.18);
   border-radius:10px;padding:16px;margin-top:14px;
 }
+
+/* ── 990 Upload & Gap Map styles ──────────────────────────────────────── */
+#upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:640px){#upload-grid{grid-template-columns:1fr;}}
+.gap-map-row-hdr{display:grid;grid-template-columns:2fr 1.5fr 1.5fr 100px;}
+@media(max-width:760px){
+  #gap-map-rows>div{grid-template-columns:1fr!important;gap:6px!important;}
+  #gap-map-kpis{grid-template-columns:repeat(2,1fr)!important;}
+}
+#demo-banner{display:flex;}
+@media(max-width:580px){#demo-banner{flex-direction:column;} #demo-banner button{width:100%;}}
 </style>
 </head>
 <body>
@@ -1009,41 +1020,113 @@ button.secondary{
 </div>
 <div class="tool-body">
 
-  <!-- CHNA Upload Zone -->
-  <div style="margin-bottom:24px;">
-    <div class="section-title" style="margin-bottom:12px;">Upload Your CHNA for AI-Powered Analysis</div>
-    <div class="chna-upload-zone" id="chna-drop-zone"
-      ondragover="event.preventDefault();this.classList.add('drag-over')"
-      ondragleave="this.classList.remove('drag-over')"
-      ondrop="handleChnaDrop(event)">
-      <input type="file" id="chna-file-input" accept=".pdf,.txt" onchange="handleChnaFile(this.files[0])">
-      <div class="chna-upload-icon">📄</div>
-      <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px;">Drop your CHNA PDF here, or click to browse</div>
-      <div style="font-size:13px;color:var(--muted);">Supports PDF · Typical CHNA: 40–120 pages · Analysis takes ~45 seconds</div>
-      <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-        <span style="background:rgba(4,120,87,.08);border:1px solid rgba(4,120,87,.2);color:var(--green);border-radius:99px;padding:4px 14px;font-size:11px;font-weight:700;">✓ Priority extraction</span>
-        <span style="background:rgba(4,120,87,.08);border:1px solid rgba(4,120,87,.2);color:var(--green);border-radius:99px;padding:4px 14px;font-size:11px;font-weight:700;">✓ SDOH identification</span>
-        <span style="background:rgba(4,120,87,.08);border:1px solid rgba(4,120,87,.2);color:var(--green);border-radius:99px;padding:4px 14px;font-size:11px;font-weight:700;">✓ Schedule H gap analysis</span>
-        <span style="background:rgba(4,120,87,.08);border:1px solid rgba(4,120,87,.2);color:var(--green);border-radius:99px;padding:4px 14px;font-size:11px;font-weight:700;">✓ Funder alignment prep</span>
+  <!-- ═══ DEMO DATA BANNER — PROMINENT CTA ═══════════════════════════════ -->
+  <div id="demo-banner" style="background:linear-gradient(135deg,var(--navy) 0%,#002455 100%);border-radius:12px;padding:18px 22px;margin-bottom:24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:220px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold2);margin-bottom:5px;">See the Full Platform in Action</div>
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;">Don't have your CHNA or 990 handy?</div>
+      <div style="font-size:12.5px;color:rgba(255,255,255,.6);line-height:1.65;">Load the Olmsted County / Mayo Clinic example dataset — a fully populated CHNA + Schedule H that unlocks every downstream step, the complete gap map, Fair Share Calculator, ROI model, and all nine generated documents.</div>
+    </div>
+    <button onclick="loadExampleBoth()" style="flex-shrink:0;background:linear-gradient(135deg,var(--gold),#A07810);color:var(--navy);border:none;border-radius:10px;padding:14px 26px;font-size:14px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(201,162,39,.45);transition:transform .1s;white-space:nowrap;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+      📊 Load Demo Data &amp; Continue →
+    </button>
+  </div>
+
+  <!-- ═══ UPLOAD SECTION — Two-column CHNA + 990 ══════════════════════════ -->
+  <div style="margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="flex:1;height:1px;background:var(--border);"></div>
+      <span style="font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap;">OR UPLOAD YOUR OWN DOCUMENTS FOR A PERSONALIZED ANALYSIS</span>
+      <div style="flex:1;height:1px;background:var(--border);"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;" id="upload-grid">
+
+      <!-- CHNA Upload -->
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+          <span style="background:var(--gold);color:var(--navy);border-radius:50%;width:20px;height:20px;font-size:10px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;">1</span>
+          Community Health Needs Assessment
+        </div>
+        <div class="chna-upload-zone" id="chna-drop-zone" style="padding:22px 16px;"
+          ondragover="event.preventDefault();this.classList.add('drag-over')"
+          ondragleave="this.classList.remove('drag-over')"
+          ondrop="handleChnaDrop(event)">
+          <input type="file" id="chna-file-input" accept=".pdf,.txt" onchange="handleChnaFile(this.files[0])">
+          <div style="font-size:28px;margin-bottom:8px;">📄</div>
+          <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;">Drop CHNA PDF here</div>
+          <div style="font-size:11.5px;color:var(--muted);">or click to browse</div>
+          <div id="chna-upload-badge" style="display:none;margin-top:10px;background:rgba(4,120,87,.1);border:1px solid rgba(4,120,87,.3);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;color:var(--green);"></div>
+        </div>
+        <div id="chna-upload-status" style="display:none;margin-top:8px;padding:8px 12px;border-radius:7px;font-size:12px;"></div>
+      </div>
+
+      <!-- 990 / Schedule H Upload -->
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+          <span style="background:rgba(124,58,237,1);color:#fff;border-radius:50%;width:20px;height:20px;font-size:10px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;">2</span>
+          IRS Form 990 / Schedule H
+          <span style="font-size:10px;font-weight:700;background:rgba(4,120,87,.1);color:var(--green);border-radius:99px;padding:2px 8px;border:1px solid rgba(4,120,87,.2);">Optional</span>
+        </div>
+        <div class="chna-upload-zone" id="h990-drop-zone" style="padding:22px 16px;border-color:rgba(124,58,237,.35);background:rgba(124,58,237,.02);" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"
+          ondragover="event.preventDefault();this.classList.add('drag-over')"
+          ondragleave="this.classList.remove('drag-over')"
+          ondrop="handle990Drop(event)">
+          <input type="file" id="h990-file-input" accept=".pdf,.txt" onchange="handle990File(this.files[0])">
+          <div style="font-size:28px;margin-bottom:8px;">📊</div>
+          <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;">Drop Form 990 PDF here</div>
+          <div style="font-size:11.5px;color:var(--muted);">Unlocks gap map &amp; Fair Share auto-fill</div>
+          <div id="h990-upload-badge" style="display:none;margin-top:10px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;color:#6D28D9;"></div>
+        </div>
+        <div id="h990-upload-status" style="display:none;margin-top:8px;padding:8px 12px;border-radius:7px;font-size:12px;"></div>
       </div>
     </div>
-    <div id="chna-upload-status" style="display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;"></div>
-    <div id="chna-analyzing" style="display:none;margin-top:16px;background:rgba(0,53,122,.04);border:1px solid rgba(0,53,122,.12);border-radius:10px;padding:20px;text-align:center;">
-      <div style="font-size:26px;margin-bottom:8px;">🔍</div>
-      <div style="font-weight:700;color:var(--navy);margin-bottom:4px;" id="chna-analyze-msg">Analyzing your CHNA…</div>
-      <div style="font-size:12px;color:var(--muted);" id="chna-analyze-sub">Extracting health priorities, population data, and SDOH factors</div>
-      <div style="height:4px;background:var(--border);border-radius:2px;margin-top:14px;overflow:hidden;">
+
+    <!-- Analyzing states -->
+    <div id="chna-analyzing" style="display:none;margin-top:14px;background:rgba(0,53,122,.04);border:1px solid rgba(0,53,122,.12);border-radius:10px;padding:18px;text-align:center;">
+      <div style="font-size:24px;margin-bottom:6px;">🔍</div>
+      <div style="font-weight:700;color:var(--navy);margin-bottom:3px;" id="chna-analyze-msg">Analyzing your documents…</div>
+      <div style="font-size:12px;color:var(--muted);" id="chna-analyze-sub">Extracting health priorities, Schedule H line items, and gap data</div>
+      <div style="height:4px;background:var(--border);border-radius:2px;margin-top:12px;overflow:hidden;">
         <div id="chna-analyze-prog" style="height:100%;background:linear-gradient(90deg,var(--gold),var(--teal2));width:0%;transition:width .4s;border-radius:2px;"></div>
       </div>
     </div>
+
+    <!-- No API key notice -->
     <div id="chna-no-key-notice" style="display:none;margin-top:12px;background:rgba(124,58,237,.04);border:1px solid rgba(124,58,237,.18);border-radius:10px;padding:14px 16px;">
       <div style="font-size:13px;font-weight:700;color:#6D28D9;margin-bottom:5px;">🔑 API Key Required for AI Analysis</div>
-      <p class="small" style="margin-bottom:8px;">Add your Anthropic API key in <strong>Step 00: Setup</strong> to activate AI-powered CHNA analysis. You can still use example data and all other platform features.</p>
+      <p class="small" style="margin-bottom:8px;">Add your Anthropic API key in <strong>Step 00: Setup</strong> to activate AI document analysis. Or use the demo data above — it showcases the full platform workflow.</p>
       <button onclick="go('setup')" style="background:rgba(109,40,217,.1);border:1px solid rgba(109,40,217,.3);color:#6D28D9;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Go to Setup →</button>
     </div>
   </div>
 
-  <!-- CHNA AI Analysis Results -->
+  <!-- ═══ GAP MAP OUTPUT — shown after both uploads OR demo data ══════════ -->
+  <div id="gap-map-section" style="display:none;margin-bottom:28px;">
+
+    <!-- Gap map header -->
+    <div style="background:linear-gradient(135deg,#1e1b4b,#2e1065);border-radius:12px 12px 0 0;padding:16px 20px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:22px;">🗺️</span>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:800;color:#E8C84A;letter-spacing:-.01em;">CHNA × Schedule H Gap Map</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:2px;" id="gap-map-subtitle">Cross-referencing your documented health priorities against Schedule H community benefit spending</div>
+      </div>
+      <div id="gap-map-badge" style="background:rgba(185,28,28,.2);border:1px solid rgba(185,28,28,.4);border-radius:8px;padding:6px 14px;text-align:center;">
+        <div style="font-size:18px;font-weight:900;color:#fca5a5;" id="gap-count">—</div>
+        <div style="font-size:9px;font-weight:700;color:rgba(252,165,165,.7);text-transform:uppercase;letter-spacing:.06em;">Priority Gaps</div>
+      </div>
+    </div>
+
+    <!-- Gap map summary KPIs -->
+    <div id="gap-map-kpis" style="display:grid;grid-template-columns:repeat(4,1fr);background:rgba(30,27,75,.04);border:1px solid rgba(124,58,237,.15);border-top:none;border-bottom:none;"></div>
+
+    <!-- Gap map rows -->
+    <div id="gap-map-rows" style="border:1px solid rgba(124,58,237,.15);border-top:none;border-radius:0 0 12px 12px;overflow:hidden;background:#fff;"></div>
+
+    <!-- Gap map narrative -->
+    <div id="gap-map-narrative" style="margin-top:14px;background:rgba(201,162,39,.05);border:1px solid rgba(201,162,39,.2);border-radius:10px;padding:16px 18px;font-size:13px;color:#4a5568;line-height:1.75;"></div>
+  </div>
+
+  <!-- ═══ CHNA ANALYSIS RESULTS (from upload or demo) ════════════════════ -->
   <div id="chna-results" style="display:none;">
     <div class="chna-analysis-result" style="margin-bottom:20px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
@@ -1052,37 +1135,31 @@ button.secondary{
           <div style="font-weight:800;color:var(--green);font-size:14px;" id="chna-result-title">CHNA Analysis Complete</div>
           <div style="font-size:12px;color:var(--muted);" id="chna-result-source">Extracted from uploaded document</div>
         </div>
-        <button onclick="clearChnaAnalysis()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;color:var(--muted);font-family:inherit;">↑ Upload new</button>
+        <button onclick="clearAllAnalysis()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;color:var(--muted);font-family:inherit;">↺ Reset</button>
       </div>
       <div id="chna-result-summary" style="font-size:13px;color:#334155;line-height:1.75;"></div>
     </div>
     <div style="margin-bottom:20px;">
       <div class="section-title" style="margin-bottom:10px;">Extracted Health Priorities</div>
-      <p class="small" style="margin-bottom:12px;">Review and confirm these AI-extracted priorities. They drive all downstream analysis — ROI calculations, funder matching, and document generation. Click any card to edit.</p>
+      <p class="small" style="margin-bottom:12px;">AI-extracted from your CHNA. These drive all downstream analysis — ROI calculations, funder matching, and document generation.</p>
       <div id="chna-priorities-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;"></div>
-    </div>
-    <div style="margin-bottom:20px;">
-      <div class="section-title" style="margin-bottom:10px;">Schedule H Gap Analysis</div>
-      <p class="small" style="margin-bottom:12px;">These findings identify where your CHNA priorities are likely underdocumented on IRS Form 990 Schedule H — creating both compliance exposure and untapped funding opportunity.</p>
-      <div id="chna-gaps-list"></div>
     </div>
     <div id="chna-nemt-connection" style="margin-bottom:20px;background:rgba(201,162,39,.05);border:1px solid rgba(201,162,39,.2);border-radius:10px;padding:16px;display:none;"></div>
   </div>
 
-  <!-- Manual / Example options -->
+  <!-- Manual entry fallback -->
   <div id="chna-manual-section">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
       <div style="flex:1;height:1px;background:var(--border);"></div>
-      <span style="font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap;">OR USE EXAMPLE / MANUAL ENTRY</span>
+      <span style="font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap;">OR ENTER PRIORITIES MANUALLY</span>
       <div style="flex:1;height:1px;background:var(--border);"></div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
-      <button onclick="loadExampleChna()" style="background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.3);color:#7A5C00;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📊 Load Example CHNA Data</button>
+    <div style="margin-bottom:16px;">
       <button onclick="showManualChnaEntry()" style="background:#fff;border:1px solid var(--border);color:var(--navy);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">✏️ Enter Priorities Manually</button>
     </div>
     <div id="chna-manual-form" style="display:none;border:1px solid var(--border);border-radius:10px;padding:18px;background:#fff;">
       <div class="section-title" style="margin-bottom:12px;font-size:14px;">Manual Priority Entry</div>
-      <p class="small" style="margin-bottom:14px;">Enter your top 3 CHNA health priorities. Include populations affected, key data points, and any SDOH factors for best downstream results.</p>
+      <p class="small" style="margin-bottom:14px;">Enter your top 3 CHNA health priorities with populations, data points, and SDOH factors for best results.</p>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div class="setup-field"><label>Priority #1</label><textarea id="manual_p1" placeholder="e.g., Access to Care — 34% of residents delayed care due to transportation, insurance, or appointment availability barriers."></textarea></div>
         <div class="setup-field"><label>Priority #2</label><textarea id="manual_p2" placeholder="e.g., Mental Health — Rates of depression and anxiety above state average; limited outpatient capacity in rural ZIP codes."></textarea></div>
@@ -1092,6 +1169,10 @@ button.secondary{
     </div>
   </div>
 
+  <!-- EXISTING CONTENT BELOW - shown when example loaded -->
+  <div id="chna-existing-content" style="display:none;">
+  <div class="section-title" style="font-size:17px;margin-bottom:4px;" id="chna-section-title">Community Health Needs Assessment — Evidence &amp; Priority Analysis</div>
+  <p class="small" style="margin-bottom:16px;" id="chna-section-desc">Click each priority node to expand the evidence and NEMT connection.</p>
   <!-- EXISTING CONTENT BELOW - shown when example loaded -->
   <div id="chna-existing-content" style="display:none;">
   <div class="section-title" style="font-size:17px;margin-bottom:4px;" id="chna-section-title">Community Health Needs Assessment — Evidence &amp; Priority Analysis</div>
@@ -6850,6 +6931,454 @@ window.clearChnaAnalysis = function() {
   if (fileInput) fileInput.value = '';
   window._aqChna = null;
 };
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   990 / SCHEDULE H UPLOAD, GAP MAP, AND COMBINED DEMO DATA
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+window._aq990 = null; // Stores extracted Schedule H data
+
+// ── 990 file handlers ─────────────────────────────────────────────────────
+window.handle990Drop = function(e) {
+  e.preventDefault();
+  var zone = document.getElementById('h990-drop-zone');
+  if (zone) zone.classList.remove('drag-over');
+  var files = e.dataTransfer && e.dataTransfer.files;
+  if (files && files[0]) handle990File(files[0]);
+};
+
+window.handle990File = function(file) {
+  if (!file) return;
+  var status = document.getElementById('h990-upload-status');
+  var badge = document.getElementById('h990-upload-badge');
+  var isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+  var isTXT = file.type === 'text/plain' || file.name.toLowerCase().endsWith('.txt');
+  if (!isPDF && !isTXT) {
+    if (status) { status.style.display='block'; status.style.background='#FEE2E2'; status.style.color='#B91C1C'; status.textContent='Unsupported type. Use PDF or TXT.'; }
+    return;
+  }
+  if (badge) { badge.style.display='block'; badge.textContent='📊 ' + file.name; }
+  if (status) { status.style.display='block'; status.style.background='rgba(124,58,237,.05)'; status.style.color='#4c1d95'; status.textContent='Reading ' + file.name + '…'; }
+
+  if (isTXT) {
+    var reader = new FileReader();
+    reader.onload = function(e) { analyze990(e.target.result, file.name); };
+    reader.readAsText(file);
+  } else {
+    extractPDFText(file, function(text) { analyze990(text, file.name); });
+  }
+};
+
+// ── AI extraction for 990 / Schedule H ────────────────────────────────────
+window.analyze990 = function(text, filename) {
+  var apiKey = localStorage.getItem('aq_fi_key') || '';
+  apiKey = apiKey.replace(/[^\x20-\x7E]/g, '').trim();
+  var noKeyEl = document.getElementById('chna-no-key-notice');
+  var analyzing = document.getElementById('chna-analyzing');
+  var status = document.getElementById('h990-upload-status');
+
+  if (!apiKey || apiKey.indexOf('sk-ant') !== 0) {
+    if (noKeyEl) noKeyEl.style.display = 'block';
+    return;
+  }
+  if (noKeyEl) noKeyEl.style.display = 'none';
+  if (analyzing) { analyzing.style.display = 'block'; }
+  var msg = document.getElementById('chna-analyze-msg');
+  var sub = document.getElementById('chna-analyze-sub');
+  var prog = document.getElementById('chna-analyze-prog');
+  if (msg) msg.textContent = 'Extracting Schedule H line items…';
+  if (sub) sub.textContent = 'Reading Part I categories, totals, and community benefit narrative';
+
+  var pct = 20;
+  var timer = setInterval(function() {
+    pct = Math.min(pct + 3, 88);
+    if (prog) prog.style.width = pct + '%';
+  }, 350);
+
+  var orgName = window._aqOrg.name || 'this health system';
+
+  var sysPrompt = 'You are a healthcare finance analyst specializing in IRS Form 990 Schedule H. Extract structured data from the provided 990 document. Return ONLY valid JSON — no markdown, no explanation.';
+
+  var prompt = 'Extract Schedule H and financial data from this IRS Form 990 for ' + orgName + '.\n\nReturn ONLY this JSON:\n{\n  "org_name": "string",\n  "fiscal_year": "string",\n  "total_expenses": number,\n  "total_revenue": number,\n  "community_benefit_total": number,\n  "cb_pct_of_expenses": number,\n  "tax_exemption_estimate": number,\n  "schedule_h_lines": {\n    "financial_assistance": number,\n    "medicaid_unreimbursed": number,\n    "means_tested_other": number,\n    "physician_clinical_training": number,\n    "nursing_allied_training": number,\n    "health_professions_education": number,\n    "subsidized_health_services": number,\n    "community_health_improvement": number,\n    "physical_improvements": number,\n    "social_community_building": number,\n    "community_health_education": number,\n    "contributions_community_groups": number,\n    "cash_inkind_contributions": number,\n    "community_benefit_operations": number\n  },\n  "transportation_documented": boolean,\n  "transportation_notes": "string or null",\n  "chis_line7e": number,\n  "cb_narrative_excerpt": "string — up to 150 words from Part VI community benefit narrative",\n  "lmi_patients_served": "string or null",\n  "implementation_strategy_mentioned": boolean\n}\n\n990 TEXT (first 12000 chars):\n' + text.substring(0, 12000);
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'https://api.anthropic.com/v1/messages', true);
+  xhr.setRequestHeader('content-type', 'application/json');
+  xhr.setRequestHeader('x-api-key', apiKey);
+  xhr.setRequestHeader('anthropic-version', '2023-06-01');
+  xhr.setRequestHeader('anthropic-dangerous-direct-browser-access', 'true');
+
+  xhr.onload = function() {
+    clearInterval(timer);
+    if (prog) prog.style.width = '100%';
+    if (analyzing) analyzing.style.display = 'none';
+    try {
+      var data = JSON.parse(xhr.responseText);
+      if (data.error) {
+        if (status) { status.style.color='#B91C1C'; status.textContent='API error: '+data.error.message; }
+        return;
+      }
+      var txt = '';
+      if (data.content) data.content.forEach(function(b) { if (b.type==='text') txt+=b.text; });
+      var m = txt.match(/\{[\s\S]*\}/);
+      if (!m) { if (status) { status.style.color='#B91C1C'; status.textContent='Could not parse 990 data.'; } return; }
+      var parsed = JSON.parse(m[0]);
+      window._aq990 = parsed;
+      on990Loaded(parsed, filename);
+    } catch(e) {
+      if (status) { status.style.color='#B91C1C'; status.textContent='Parse error: '+e.message; }
+    }
+  };
+  xhr.onerror = function() {
+    clearInterval(timer);
+    if (analyzing) analyzing.style.display='none';
+    if (status) { status.style.color='#B91C1C'; status.textContent='Network error.'; }
+  };
+  xhr.send(JSON.stringify({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1500,
+    system: sysPrompt,
+    messages: [{ role: 'user', content: prompt }]
+  }));
+};
+
+// ── Called when 990 data is ready ─────────────────────────────────────────
+window.on990Loaded = function(data, sourceName) {
+  var status = document.getElementById('h990-upload-status');
+  if (status) {
+    status.style.display = 'block';
+    status.style.background = 'rgba(124,58,237,.06)';
+    status.style.color = '#4c1d95';
+    status.innerHTML = '✓ Schedule H extracted from <strong>' + (sourceName||'document') + '</strong> · FY ' + (data.fiscal_year||'N/A') + ' · Community benefit: $' + fmtMillion(data.community_benefit_total);
+  }
+  // Auto-fill Fair Share Calculator fields
+  autoFillFairShare(data);
+  // Try to build gap map if CHNA data also available
+  if (window._aqChna) buildGapMap(window._aqChna, data);
+};
+
+function fmtMillion(n) {
+  if (!n) return '—';
+  if (n >= 1e9) return (n/1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(0) + 'K';
+  return Math.round(n).toLocaleString();
+}
+
+// ── Auto-fill Fair Share Calculator ───────────────────────────────────────
+window.autoFillFairShare = function(data) {
+  function setFS(id, val) {
+    var el = document.getElementById(id);
+    if (el && val) el.value = Math.round(val).toLocaleString('en-US');
+  }
+  setFS('fs_total_exp',  data.total_expenses);
+  setFS('fs_cb_total',   data.community_benefit_total);
+  setFS('fs_tax_exempt', data.tax_exemption_estimate || (data.total_expenses * 0.077));
+  setFS('fs_chis',       data.chis_line7e || data.schedule_h_lines && data.schedule_h_lines.community_health_improvement);
+  // Set org name in Fair Share
+  var fsName = document.getElementById('fs_org_name');
+  if (fsName && data.org_name) fsName.value = data.org_name;
+  // Trigger recalc
+  if (typeof calcFairShare === 'function') calcFairShare();
+};
+
+// ── GAP MAP BUILDER ────────────────────────────────────────────────────────
+window.buildGapMap = function(chnaData, h990Data) {
+  var section = document.getElementById('gap-map-section');
+  if (!section) return;
+  section.style.display = 'block';
+
+  var priorities = chnaData && chnaData.priorities || [];
+  var schedH = h990Data && h990Data.schedule_h_lines || {};
+  var cbTotal = (h990Data && h990Data.community_benefit_total) || 0;
+  var totalExp = (h990Data && h990Data.total_expenses) || 0;
+  var transportDocumented = h990Data && h990Data.transportation_documented;
+
+  // Update subtitle
+  var subtitle = document.getElementById('gap-map-subtitle');
+  var orgName = (chnaData && chnaData.org_name) || (window._aqOrg && window._aqOrg.name) || 'Your Organization';
+  var yr = (h990Data && h990Data.fiscal_year) || '';
+  if (subtitle) subtitle.textContent = orgName + (yr ? ' · FY ' + yr : '') + ' · Cross-referencing CHNA priorities against Schedule H spending';
+
+  // Schedule H category mappings
+  var schedHCategories = [
+    { key:'financial_assistance',        label:'Financial Assistance',             line:'1',   val: schedH.financial_assistance||0 },
+    { key:'medicaid_unreimbursed',        label:'Unreimbursed Medicaid',            line:'2',   val: schedH.medicaid_unreimbursed||0 },
+    { key:'community_health_improvement', label:'Community Health Improvement (7e)',line:'7e',  val: schedH.community_health_improvement || h990Data && h990Data.chis_line7e || 0 },
+    { key:'community_health_education',   label:'Community Health Education (7h)',  line:'7h',  val: schedH.community_health_education||0 },
+    { key:'social_community_building',    label:'Social & Community Building (7g)', line:'7g',  val: schedH.social_community_building||0 },
+    { key:'contributions_community_groups',label:'Contributions to Community Groups (7i)','line':'7i', val: schedH.contributions_community_groups||0 }
+  ];
+
+  // Build summary KPIs
+  var chisAmt = schedH.community_health_improvement || h990Data && h990Data.chis_line7e || 0;
+  var chisPct = cbTotal ? (chisAmt/cbTotal*100).toFixed(1) : '—';
+  var cbPct = totalExp ? (cbTotal/totalExp*100).toFixed(1) : '—';
+  var transportStatus = transportDocumented ? 'Documented' : 'Not Found';
+  var transportColor = transportDocumented ? '#047857' : '#B91C1C';
+
+  var gapCount = 0;
+  priorities.forEach(function(p) {
+    var line7eAmt = schedH.community_health_improvement || h990Data && h990Data.chis_line7e || 0;
+    if (!line7eAmt || line7eAmt < 50000) gapCount++;
+  });
+
+  var badgeEl = document.getElementById('gap-map-badge');
+  var countEl = document.getElementById('gap-count');
+  if (countEl) countEl.textContent = gapCount + ' of ' + priorities.length;
+  if (badgeEl) {
+    var color = gapCount >= priorities.length ? 'rgba(185,28,28,.2)' : gapCount > 0 ? 'rgba(180,83,9,.2)' : 'rgba(4,120,87,.2)';
+    var borderColor = gapCount >= priorities.length ? 'rgba(185,28,28,.4)' : gapCount > 0 ? 'rgba(180,83,9,.4)' : 'rgba(4,120,87,.4)';
+    var textColor = gapCount >= priorities.length ? '#fca5a5' : gapCount > 0 ? '#fcd34d' : '#6ee7b7';
+    badgeEl.style.background = color;
+    badgeEl.style.borderColor = borderColor;
+    if (countEl) countEl.style.color = textColor;
+  }
+
+  var kpisEl = document.getElementById('gap-map-kpis');
+  if (kpisEl) {
+    kpisEl.innerHTML = [
+      { label:'Community Benefit', value:'$'+fmtMillion(cbTotal), sub: cbPct+'% of expenses', color:'#4c1d95' },
+      { label:'Line 7e (CHIS)', value:'$'+fmtMillion(chisAmt), sub: chisPct+'% of total CB', color:'#0A6B62' },
+      { label:'Transport on 990', value:transportStatus, sub: h990Data && h990Data.transportation_notes ? 'See notes' : 'Line 7e / Part II', color:transportColor },
+      { label:'Total Expenses', value:'$'+fmtMillion(totalExp), sub:'FY '+(yr||'N/A'), color:'#001533' }
+    ].map(function(k) {
+      return '<div style="padding:12px 14px;border-right:1px solid rgba(124,58,237,.1);">' +
+        '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:'+k.color+';margin-bottom:3px;">'+k.label+'</div>' +
+        '<div style="font-size:17px;font-weight:800;color:var(--navy);">'+k.value+'</div>' +
+        '<div style="font-size:10px;color:var(--muted);">'+k.sub+'</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  // Build priority rows
+  var rowsEl = document.getElementById('gap-map-rows');
+  if (rowsEl && priorities.length) {
+    rowsEl.innerHTML = '';
+
+    // Column header
+    var hdr = document.createElement('div');
+    hdr.style.cssText = 'display:grid;grid-template-columns:2fr 1.5fr 1.5fr 100px;gap:0;padding:10px 18px;background:rgba(30,27,75,.06);border-bottom:1px solid rgba(124,58,237,.12);';
+    hdr.innerHTML = ['CHNA Priority','Evidence / Data Point','Schedule H Category','Status'].map(function(h) {
+      return '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);">'+h+'</div>';
+    }).join('');
+    rowsEl.appendChild(hdr);
+
+    priorities.forEach(function(p, i) {
+      // Determine Schedule H category and current spend
+      var schCat = p.schedule_h_category || 'Line 7e — CHIS';
+      var schAmt = 0;
+      if (schCat.indexOf('7e') > -1 || schCat.toLowerCase().indexOf('community health improvement') > -1) {
+        schAmt = schedH.community_health_improvement || h990Data && h990Data.chis_line7e || 0;
+      } else if (schCat.indexOf('7i') > -1) {
+        schAmt = schedH.contributions_community_groups || 0;
+      } else if (schCat.indexOf('7h') > -1) {
+        schAmt = schedH.community_health_education || 0;
+      } else if (schCat.indexOf('7g') > -1) {
+        schAmt = schedH.social_community_building || 0;
+      }
+
+      var isGap = !schAmt || schAmt < 50000;
+      var isUnderfunded = schAmt > 0 && schAmt < 500000;
+      var statusLabel = isGap ? 'Gap' : isUnderfunded ? 'Low' : 'Covered';
+      var statusColor = isGap ? '#B91C1C' : isUnderfunded ? '#B45309' : '#047857';
+      var statusBg = isGap ? '#FEE2E2' : isUnderfunded ? '#FEF3C7' : '#D1FAE5';
+      var rowBg = i % 2 === 0 ? '#fff' : '#FAFAF9';
+
+      var row = document.createElement('div');
+      row.style.cssText = 'display:grid;grid-template-columns:2fr 1.5fr 1.5fr 100px;gap:0;padding:13px 18px;background:'+rowBg+';border-bottom:1px solid var(--border);align-items:start;';
+      row.innerHTML =
+        '<div>' +
+          '<div style="font-weight:700;font-size:13px;color:var(--navy);margin-bottom:2px;">' + (p.rank ? '#'+p.rank+' — ':'') + (p.name||'Priority') + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);">' + (p.population||'') + '</div>' +
+        '</div>' +
+        '<div style="font-size:12px;color:#334155;">' + (p.key_stat ? '<strong style="color:var(--navy);">' + p.key_stat + '</strong><br>' : '') + (p.nemt_connection ? '<span style="font-size:11px;color:var(--muted);">' + p.nemt_connection.substring(0,80) + '…</span>' : '') + '</div>' +
+        '<div>' +
+          '<div style="font-size:11.5px;font-weight:600;color:#4c1d95;margin-bottom:3px;">' + schCat + '</div>' +
+          '<div style="font-size:12px;color:var(--navy);">' + (schAmt ? '$'+fmtMillion(schAmt)+' reported' : '<span style="color:#B91C1C;font-weight:700;">$0 — Not documented</span>') + '</div>' +
+        '</div>' +
+        '<div style="text-align:center;">' +
+          '<span style="display:inline-block;background:'+statusBg+';color:'+statusColor+';border-radius:6px;padding:5px 10px;font-size:11px;font-weight:800;">' + statusLabel + '</span>' +
+        '</div>';
+      rowsEl.appendChild(row);
+    });
+
+    // Add transport row if not covered
+    if (!transportDocumented) {
+      var row2 = document.createElement('div');
+      row2.style.cssText = 'display:grid;grid-template-columns:2fr 1.5fr 1.5fr 100px;gap:0;padding:13px 18px;background:rgba(185,28,28,.03);border-bottom:1px solid var(--border);align-items:start;';
+      row2.innerHTML =
+        '<div><div style="font-weight:700;font-size:13px;color:#B91C1C;">Transportation / NEMT</div><div style="font-size:11px;color:var(--muted);">SDOH barrier — LMI population</div></div>' +
+        '<div style="font-size:12px;color:#334155;"><strong style="color:var(--navy);">Primary access barrier</strong><br><span style="font-size:11px;color:var(--muted);">Transportation cited in CHNA but not reflected on 990</span></div>' +
+        '<div><div style="font-size:11.5px;font-weight:600;color:#4c1d95;margin-bottom:3px;">Line 7e — CHIS</div><div style="font-size:12px;color:#B91C1C;font-weight:700;">Not documented</div></div>' +
+        '<div style="text-align:center;"><span style="display:inline-block;background:#FEE2E2;color:#B91C1C;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:800;">Gap</span></div>';
+      rowsEl.appendChild(row2);
+    }
+  }
+
+  // Build narrative
+  var narEl = document.getElementById('gap-map-narrative');
+  if (narEl) {
+    var gapPriorities = priorities.filter(function(p) {
+      var s = p.schedule_h_category || 'Line 7e';
+      var amt = 0;
+      if (s.indexOf('7e') > -1) amt = schedH.community_health_improvement || h990Data && h990Data.chis_line7e || 0;
+      return !amt || amt < 50000;
+    });
+
+    var narrative = '<strong style="color:var(--navy);">What this means for your funding case:</strong> ';
+    if (gapPriorities.length === 0 && transportDocumented) {
+      narrative += 'Your Schedule H community benefit spending is well-aligned with your CHNA priorities — a strong compliance position. Focus your funding case on expanding existing programs and demonstrating outcomes improvement rather than closing documentation gaps.';
+    } else {
+      var gapNames = gapPriorities.map(function(p) { return '<strong>' + p.name + '</strong>'; }).join(', ');
+      narrative += (gapNames || 'Several CHNA priorities') + ' appear underdocumented on Schedule H Part I. ';
+      if (!transportDocumented) narrative += 'Transportation is documented as a community health barrier in your CHNA but does not appear in Schedule H Line 7e — this is your highest-priority documentation gap and your strongest argument for building an NEMT program. ';
+      narrative += 'These gaps are simultaneously your IRS compliance vulnerability and your most compelling argument for external investment. Every dollar a bank or foundation commits to filling this gap strengthens both your 990 and your community benefit narrative. The generated documents in Step 06 will anchor to these specific gaps.';
+      if (h990Data && h990Data.cb_narrative_excerpt) {
+        narrative += '<br><br><strong style="color:var(--navy);">From your 990 Part VI narrative:</strong> <em style="color:#475569;">"' + h990Data.cb_narrative_excerpt.substring(0,200) + (h990Data.cb_narrative_excerpt.length > 200 ? '…' : '') + '"</em>';
+      }
+    }
+    narEl.innerHTML = narrative;
+  }
+};
+
+// ── DEMO DATA LOADER — loads both CHNA + 990 + builds gap map ─────────────
+window.loadExampleBoth = function() {
+  // Demo CHNA data (Olmsted County)
+  var chnaDemo = {
+    org_name: 'Olmsted County Regional Health System (Example)',
+    chna_year: '2025',
+    service_area: 'Olmsted County, MN (Rochester MSA)',
+    survey_respondents: '937',
+    transportation_findings: '34% of adults delayed care due to access barriers; 51% of prior no-show patients cited transportation as a contributing factor. Disability population (9.7%, ~16,000 residents) and foreign-born residents (11.1%) face the highest NEMT need.',
+    lmi_population: 'Approximately 18-22% below 200% FPL',
+    priorities: [
+      {rank:1, name:'Access to Care', description:'34% of county adults delayed or avoided care; 15% lack a primary care provider. Top barriers: inability to get appointments, transportation, and cost.', key_stat:'34% delayed care', population:'LMI adults, disability & foreign-born populations', sdoh_factors:['Transportation','Insurance','Language'], nemt_connection:'Transportation is the #1 documented barrier for 51% of prior no-show patients. NEMT directly addresses the primary driver.', schedule_h_category:'Line 7e — Community Health Improvement Services'},
+      {rank:2, name:'Mental Health & Substance Use', description:'37% of adults reported mental health challenges — up 3% since 2021. Depression rates (28%) exceed state (23%) and national (22%) averages.', key_stat:'37% reported challenges', population:'Adults 18–64, adolescents', sdoh_factors:['Transportation','Social isolation','Economic stress'], nemt_connection:'Behavioral health appointments have disproportionately high transportation-attributable no-show rates.', schedule_h_category:'Line 7e — Community Health Improvement Services'},
+      {rank:3, name:'Food Security & Nutrition', description:'33,000 Channel One Food Bank clients in 2024; 23% Hispanic, 14% Black. Food insecurity co-occurs strongly with transportation barriers.', key_stat:'33,000 food bank clients', population:'Hispanic and Black residents, LMI households', sdoh_factors:['Transportation','Economic stability','Food access'], nemt_connection:'Food-insecure patients are significantly more likely to miss medical appointments due to competing transportation priorities.', schedule_h_category:'Line 7i — Contributions to Community Groups'}
+    ],
+    schedule_h_gaps: [
+      {priority:'Access to Care / Transportation', gap_description:'Transportation is identified as the primary access barrier in the CHNA but NEMT programming is not documented in Schedule H Line 7e, creating a gap between identified need and documented community benefit response.', risk_level:'high', recommendation:'Document NEMT program under Schedule H Line 7e with patient volume, LMI demographics, and geographic targeting data.'},
+      {priority:'Mental Health', gap_description:'Behavioral health access barriers are documented but mental health community benefit activities may be underrepresented in Schedule H relative to the documented prevalence.', risk_level:'medium', recommendation:'Review Schedule H Part I for mental health service documentation; ensure community mental health improvement services are properly categorized.'},
+      {priority:'Community Benefit Total', gap_description:'National median community benefit as a percentage of total expenses is 7–9%. Ensure your Schedule H total meets or exceeds this benchmark.', risk_level:'medium', recommendation:'Compare current Schedule H total to peer hospital benchmarks; identify underdocumented community benefit activities.'}
+    ],
+    data_sources: ['2024 CHNA Community Survey (N=937)', 'Rochester Epidemiology Project', 'U.S. Census ACS 2023', 'CDC PLACES 2024', 'Channel One Food Bank 2024'],
+    implementation_strategy_gaps: 'NEMT as an implementation strategy response to access-to-care priority would benefit from more explicit documentation linking transportation interventions to CHNA-identified needs.'
+  };
+
+  // Demo 990 / Schedule H data (illustrative Mayo-scale numbers)
+  var h990Demo = {
+    org_name: 'Olmsted County Regional Health System (Example)',
+    fiscal_year: '2024',
+    total_expenses: 4200000000,
+    total_revenue: 4350000000,
+    community_benefit_total: 780000000,
+    cb_pct_of_expenses: 18.6,
+    tax_exemption_estimate: 400000000,
+    schedule_h_lines: {
+      financial_assistance:          285000000,
+      medicaid_unreimbursed:         310000000,
+      means_tested_other:             42000000,
+      physician_clinical_training:    28000000,
+      nursing_allied_training:        14000000,
+      health_professions_education:   18000000,
+      subsidized_health_services:     35000000,
+      community_health_improvement:   12000000,
+      physical_improvements:           5000000,
+      social_community_building:       3000000,
+      community_health_education:      9000000,
+      contributions_community_groups:  6000000,
+      cash_inkind_contributions:       4000000,
+      community_benefit_operations:    9000000
+    },
+    transportation_documented: false,
+    transportation_notes: 'Transportation not listed as a distinct Line 7e activity in Schedule H — identified as a gap relative to CHNA Priority #1 (Access to Care).',
+    chis_line7e: 12000000,
+    cb_narrative_excerpt: 'The health system is committed to addressing the needs identified in the 2025 Olmsted County Community Health Needs Assessment, with particular focus on access to care, mental health services, and food security programming for low-income residents in the greater Rochester area.',
+    lmi_patients_served: 'Approximately 22% of patients at or below 200% of the federal poverty level',
+    implementation_strategy_mentioned: true
+  };
+
+  window._aqChna = chnaDemo;
+  window._aq990 = h990Demo;
+
+  // Show CHNA results
+  renderChnaResults(chnaDemo, 'Example CHNA — Olmsted County 2025');
+
+  // Auto-fill Fair Share Calculator
+  autoFillFairShare(h990Demo);
+
+  // Update 990 status badge
+  var badge990 = document.getElementById('h990-upload-badge');
+  if (badge990) { badge990.style.display='block'; badge990.textContent='📊 Example Schedule H — FY 2024'; }
+  var status990 = document.getElementById('h990-upload-status');
+  if (status990) {
+    status990.style.display='block';
+    status990.style.background='rgba(124,58,237,.06)';
+    status990.style.color='#4c1d95';
+    status990.innerHTML='✓ Example 990 loaded · FY 2024 · Community benefit: $780M (18.6% of expenses)';
+  }
+
+  // Build gap map
+  buildGapMap(chnaDemo, h990Demo);
+
+  // Show existing content
+  var existing = document.getElementById('chna-existing-content');
+  if (existing) existing.style.display = 'block';
+
+  // Dismiss demo banner
+  var banner = document.getElementById('demo-banner');
+  if (banner) banner.style.display = 'none';
+
+  // Update org name if not set
+  if (!window._aqOrg.name) {
+    window._aqOrg.name = 'Olmsted County Regional Health System';
+    updateOrgPreview();
+  }
+};
+
+// ── Update clearAllAnalysis to also reset 990 ─────────────────────────────
+window.clearAllAnalysis = function() {
+  window._aqChna = null;
+  window._aq990 = null;
+  ['chna-results','gap-map-section'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  ['chna-manual-section'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'block';
+  });
+  ['chna-upload-status','h990-upload-status'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.display='none'; el.textContent=''; }
+  });
+  ['chna-upload-badge','h990-upload-badge'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display='none';
+  });
+  ['chna-file-input','h990-file-input'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  var banner = document.getElementById('demo-banner');
+  if (banner) banner.style.display = 'flex';
+  var existing = document.getElementById('chna-existing-content');
+  if (existing) existing.style.display = 'none';
+};
+
+// ── Wire up: when CHNA is loaded, check if 990 also available ─────────────
+var _origRenderChnaResults = window.renderChnaResults;
+window.renderChnaResults = function(data, sourceName) {
+  _origRenderChnaResults(data, sourceName);
+  // If 990 already loaded, trigger gap map
+  if (window._aq990) buildGapMap(data, window._aq990);
+  // Hide demo banner since user has data
+  var banner = document.getElementById('demo-banner');
+  if (banner) banner.style.display = 'none';
+};
+
 
 </script>
 <script>
